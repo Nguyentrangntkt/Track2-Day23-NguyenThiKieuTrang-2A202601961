@@ -3,7 +3,3 @@
 {"ts": 1787653223.1120574, "iso": "2026-08-25T10:20:23", "step": "3_scale_pool", "ok": true, "target": "b", "from": "warm", "to": "full"}
 {"ts": 1787653229.3186207, "iso": "2026-08-25T10:20:29", "step": "4_wait_ready", "ok": true, "target": "b", "waited_s": 6.21, "ready": {"region": "b", "ready": true, "reasons": [], "pool_state": "full", "vectors": {"count": 351, "latest_doc_ts": 1787653193.584262}, "ts": 1787653229.3172226}}
 {"ts": 1787653229.3190558, "iso": "2026-08-25T10:20:29", "step": "5_dns_cutover", "ok": true, "target": "b", "from": "a", "to": "b"}
-{"ts": 1787654457.5735214, "iso": "2026-08-25T10:40:57", "step": "1_verify_target", "ok": true, "target": "b", "pool_state": "warm", "weights": null, "count": null}
-{"ts": 1787654457.5826569, "iso": "2026-08-25T10:40:57", "step": "2_restore_snapshot", "ok": true, "target": "b", "backend": "fs", "rpo_seconds": 148.02, "docs_lost": 74, "embed_model_version": "test", "snapshot_at": 1787654457.5744095, "restored_at": null, "weights": null, "count": null, "state_dir": "/home/trang/Day23-DisaterRecovery4AIInfrastructure/state/region-b"}
-{"ts": 1787654457.5859418, "iso": "2026-08-25T10:40:57", "step": "3_scale_pool", "ok": true, "target": "b", "from": "full", "to": "full"}
-{"ts": 1787654458.5868618, "iso": "2026-08-25T10:40:58", "step": "4_wait_ready", "ok": false, "target": "b", "waited_s": 1.0, "reason": "ConnectError: mocked: target khong bao gio ready", "cutover": false, "pool_rolled_back_to": "full"}

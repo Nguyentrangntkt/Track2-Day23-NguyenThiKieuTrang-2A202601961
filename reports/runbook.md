@@ -4,13 +4,13 @@ Runbook này được viết để on-call có thể chạy lúc 3h sáng mà kh
 
 | # | Bước | Lệnh | Biết là xong khi | Ai làm |
 |---|---|---|---|---|
-| 1 | Xác nhận outage | `python3 chaos/kill_region.py status` | Region A không còn ready / health probe fail liên tiếp; health checker ghi `region:a`, `to:UNHEALTHY` trong `reports/health-events.jsonl` | on-call |
-| 2 | Mở incident + bấm giờ RTO | `python3 dr/runbook.py --primary a --target b --backend fs --auto` | `reports/runbook-run.jsonl` có bước `thong_bao_incident` và ghi `t_outage` | on-call |
-| 3 | Restore state ở region phụ | `python3 state/snapshot.py get --region b --backend fs` | Snapshot restore thành công; `reports/failover-events.jsonl` có `step:2_restore_snapshot`, `ok:true`, kèm `rpo_seconds` và `docs_lost` | on-call / platform |
-| 4 | Scale pool warm→full | `python3 dr/runbook.py --primary a --target b --backend fs --auto` | `reports/failover-events.jsonl` có `step:4_wait_ready`, `ok:true`; `/readyz` của Region B trả ready | platform |
-| 5 | DNS/LB cutover | `python3 dr/runbook.py --primary a --target b --backend fs --auto` | `reports/failover-events.jsonl` có `step:5_dns_cutover`, `ok:true`, `from:a`, `to:b`; edge chuyển sang Region B | on-call / platform |
-| 6 | Verify golden signals | `curl -s http://127.0.0.1:8080/edge/state && curl -s http://127.0.0.1:8002/readyz` | Edge active region là `b`, Region B ready, request qua edge trả 200; trong drill thực tế request phục hồi đầu tiên từ B tại `+22.5s` | on-call |
-| 7 | Đo RTO + postmortem | `python3 tools/measure_rto.py --loadgen reports/drill-2-withdr.jsonl --target-rto 300` | Output có `valid:true`, `recovered_by_region:"b"`, `rto_verdict:"PASS"` và `rto_measured_s` khác null | on-call / incident commander |
+| 1 | Xác nhận outage | `python3 chaos/kill_region.py status` | Region A fail health liên tiếp / `UNHEALTHY` | on-call |
+| 2 | Mở incident + chạy failover orchestration | `python3 dr/runbook.py --primary a --target b --backend fs --auto` | `reports/runbook-run.jsonl` được tạo và workflow bắt đầu chạy | on-call |
+| 3 | Xác nhận snapshot restore | `grep '"step": "2_restore_snapshot"' reports/failover-events.jsonl` | `ok:true`, có `rpo_seconds` và `docs_lost` | on-call |
+| 4 | Xác nhận Region B ready | `grep '"step": "4_wait_ready"' reports/failover-events.jsonl` | `ok:true`, `ready:true` | on-call |
+| 5 | Xác nhận DNS/LB cutover | `grep '"step": "5_dns_cutover"' reports/failover-events.jsonl` | `ok:true`, `from:"a"`, `to:"b"` | on-call |
+| 6 | Verify golden signals | `curl -s http://127.0.0.1:8080/edge/state && curl -s http://127.0.0.1:8002/readyz` | edge ở B, Region B ready, request trả 200 | on-call |
+| 7 | Đo RTO + postmortem | `python3 tools/measure_rto.py --loadgen reports/drill-2-withdr.jsonl --target-rto 300` | `valid:true`, `rto_verdict:"PASS"` | incident commander |
 
 ## Kết quả drill gần nhất
 
