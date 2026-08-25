@@ -7,9 +7,8 @@ run/*
 !run/.gitkeep
 
 # Log/evidence sinh vien tu tao trong luc chay drill
-reports/*.jsonl
-reports/*.json
-chaos/chaos-events.jsonl
+
+
 
 # Python
 __pycache__/
